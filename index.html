@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, -apple-system, sans-serif; }
+
+    body {
+        background: linear-gradient(135deg, #eef2f7 0%, #dfe7f1 100%);
+        min-height: 100vh;
+        padding: 24px 16px;
+        max-width: 960px;
+        margin: 0 auto;
+        color: #1f2937;
+    }
+
+    .folha {
+        background: #ffffff;
+        padding: 28px 26px 34px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 22px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .header-title .icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+    .header-title h1 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #111827;
+        letter-spacing: -0.3px;
+    }
+    .header-title span {
+        display: block;
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    .badge-mes {
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1px solid #dbeafe;
+    }
+    .btn-print {
+        background: #16a34a;
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 1px 3px rgba(22, 163, 74, 0.3);
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        transition: all 0.15s;
+    }
+    .btn-print:hover { background: #15803d; }
+    .btn-print:active { transform: scale(0.97); }
+
+    h2 {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #1e40af;
+        margin: 26px 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    h2::before {
+        content: '';
+        width: 4px;
+        height: 16px;
+        background: linear-gradient(180deg, #3b82f6, #1d4ed8);
+        border-radius: 2px;
+    }
+
+    .titulo-tabela {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 14px;
+        text-align: left;
+        letter-spacing: -0.4px;
+        display: block;
+    }
+
+    /* ====== TABELA ====== */
+    .tabela {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 16px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        table-layout: fixed;
+    }
+    .tabela th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 11px 8px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+    .tabela td {
+        padding: 4px 8px;
+        border-bottom: 1px solid #f1f5f9;
+        text-align: left;
+        font-size: 14px;
+        background: #fff;
+    }
+    .tabela tbody tr:last-child td { border-bottom: none; }
+
+    .tabela th:nth-child(1), .tabela td:nth-child(1) { width: 12%; }
+    .tabela th:nth-child(2), .tabela td:nth-child(2) { width: 38%; }
+    .tabela th:nth-child(3), .tabela td:nth-child(3) { width: 20%; padding-right: 14px; }
+    .tabela th:nth-child(4), .tabela td:nth-child(4) { width: 20%; padding-left: 14px; }
+    .tabela th:nth-child(5), .tabela td:nth-child(5) { width: 10%; }
+
+    .tabela input, .tabela select {
+        width: 100%;
+        border: 1px solid transparent;
+        background: transparent;
+        padding: 8px 6px;
+        font-size: 14px;
+        color: #1f2937;
+        border-radius: 6px;
+        transition: all 0.15s;
+        font-family: inherit;
+        text-overflow: ellipsis;
+    }
+    .tabela input:focus, .tabela select:focus {
+        outline: none;
+        background: #fff;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+    .tabela .val { font-weight: 600; }
+
+    .botoes { margin: 10px 0 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+    button { font-family: inherit; cursor: pointer; border: none; transition: all 0.15s; }
+    .add {
+        background: #2563eb;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .add:hover { background: #1d4ed8; }
+
+    .del {
+        background: transparent;
+        color: #94a3b8;
+        padding: 6px 9px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+    .del:hover { background: #fee2e2; color: #dc2626; }
+
+    .lista-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 14px;
+        font-size: 14px;
+        color: #374151;
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .lista-item:last-child { border-bottom: none; }
+    #listaFixas, #listaVariaveis {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+    }
+    #listaFixas:empty::after,
+    #listaVariaveis:empty::after {
+        content: 'Nenhum item cadastrado';
+        display: block;
+        padding: 14px;
+        color: #9ca3af;
+        font-size: 13px;
+        font-style: italic;
+        text-align: center;
+        background: #f9fafb;
+    }
+    .lista-item span:last-child { font-weight: 600; color: #111827; }
+
+    .lista-item input[type="text"] {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 8px 12px;
+        text-align: right;
+        width: 140px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+    .lista-item input[type="text"]:focus {
+        outline: none;
+        background: #fff;
+        border-color: #3b82f6;
+    }
+
+    /* Blocos de total */
+    .linha-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        margin-top: 8px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .linha-total span:last-child { font-size: 15px; font-weight: 700; }
+
+    /* Bloco TOTAL DESPESAS - mesmo padrão dos outros totais */
+    .linha-total.total-despesas {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        color: #475569;
+        font-size: 13px;
+        margin-top: 14px;
+    }
+    .linha-total.total-despesas span:last-child { font-size: 15px; }
+
+    /* Bloco SALDO - mais destacado, mantém a mesma tipografia */
+    .linha-total.final {
+        background: linear-gradient(135deg, #1e40af, #1d4ed8);
+        border: none;
+        color: #ffffff;
+        font-size: 13px;
+        margin-top: 8px;
+        padding: 16px 18px;
+        border-radius: 10px;
+        box-shadow: 0 6px 16px rgba(30, 64, 175, 0.22);
+    }
+    .linha-total.final span:last-child { font-size: 18px; font-weight: 800; }
+    .linha-total.final .positivo { color: #86efac !important; }
+    .linha-total.final .vermelho { color: #fca5a5 !important; }
+
+    .vermelho { color: #dc2626 !important; }
+    .positivo { color: #16a34a !important; }
+
+    /* ====== RESPONSIVIDADE ====== */
+    @media (max-width: 600px) {
+        body { padding: 12px 8px; }
+        .folha { padding: 20px 14px 24px; border-radius: 12px; }
+        .tabela th, .tabela td { padding: 6px 4px; font-size: 11px; }
+        .tabela input, .tabela select { font-size: 12px; padding: 6px 3px; }
+        .lista-item { font-size: 13px; padding: 10px 12px; }
+        .lista-item input[type="text"] { width: 110px; font-size: 13px; }
+
+        .tabela th:nth-child(1), .tabela td:nth-child(1) { width: 13%; }
+        .tabela th:nth-child(2), .tabela td:nth-child(2) { width: 40%; }
+        .tabela th:nth-child(3), .tabela td:nth-child(3) { width: 20%; padding-right: 10px; }
+        .tabela th:nth-child(4), .tabela td:nth-child(4) { width: 19%; padding-left: 10px; }
+        .tabela th:nth-child(5), .tabela td:nth-child(5) { width: 8%; }
+
+        .linha-total { font-size: 12px; padding: 12px 14px; }
+        .linha-total span:last-child { font-size: 14px; }
+        .linha-total.final { padding: 14px 16px; }
+        .linha-total.final span:last-child { font-size: 16px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="folha">
+
+    <div class="header">
+        <div class="header-title">
+            <div class="icon">$</div>
+            <div>
+                <h1>Controle Financeiro</h1>
+                <span>Tabela sincronizada</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="badge-mes" id="badgeMes">—</div>
+            <button class="btn-print" onclick="salvarPDF()">💾 Salvar em PDF</button>
+        </div>
+    </div>
+
+    <h2 class="titulo-tabela">Gastos do Mês</h2>
+
+    <table class="tabela" id="tabelaCorpo">
+        <thead>
+            <tr>
+                <th>DIA</th>
+                <th>ITEM</th>
+                <th>CATEGORIA</th>
+                <th>VALOR</th>
+                <th style="text-align:center;">AÇÃO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="ÁGUA" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="60,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="LUZ" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="100,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="ALUGUEL" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="500,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="INTERNET" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="100,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="SUPERMERCADO" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="300,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="RESERVA EMERGENCIAL" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa" selected>FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+                <td><input class="val" value="100,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="VESTUÁRIO" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa">FIXA</option><option value="variavel" selected>VARIÁVEL</option></select></td>
+                <td><input class="val" value="200,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+            <tr>
+                <td><input class="dia"></td>
+                <td><input value="CASA" class="nome" oninput="atualizarTudo()"></td>
+                <td><select class="cat" onchange="atualizarTudo()"><option value="fixa">FIXA</option><option value="variavel" selected>VARIÁVEL</option></select></td>
+                <td><input class="val" value="150,00" oninput="atualizarTudo()"></td>
+                <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="botoes">
+        <button class="add" onclick="adicionarLinha()">+ Adicionar Item</button>
+    </div>
+
+    <h2>Receitas</h2>
+    <div class="lista-item">
+        <span>SALÁRIO:</span>
+        <input type="text" id="salario" value="960,00" oninput="atualizarTudo()">
+    </div>
+    <div class="lista-item">
+        <span>RENDA EXTRA:</span>
+        <input type="text" id="rendaExtra" value="50,00" oninput="atualizarTudo()">
+    </div>
+    <div class="linha-total">
+        <span>Total das Receitas =</span>
+        <span id="totalReceitas" class="positivo">1.010,00</span>
+    </div>
+
+    <h2>Despesas Fixas</h2>
+    <div id="listaFixas"></div>
+    <div class="linha-total">
+        <span>Total Despesas Fixas =</span>
+        <span id="somaFixas" class="vermelho">1.160,00</span>
+    </div>
+
+    <h2>Despesas Variáveis</h2>
+    <div id="listaVariaveis"></div>
+    <div class="linha-total">
+        <span>Total Despesas Variáveis =</span>
+        <span id="somaVariaveis" class="vermelho">350,00</span>
+    </div>
+
+    <!-- Total de Despesas (mantido e com estilo padronizado) -->
+    <div class="linha-total total-despesas">
+        <span>Total Despesas =</span>
+        <span id="totalDespesas" class="vermelho">1.510,00</span>
+    </div>
+
+    <!-- Saldo (destaque, mas com tipografia alinhada) -->
+    <div class="linha-total final">
+        <span>Saldo =</span>
+        <span id="saldo" class="vermelho">- 500,00</span>
+    </div>
+</div>
+
+<script>
+    // ====== DATA ATUAL ======
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                   'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const hoje = new Date();
+    const diaAtual = String(hoje.getDate()).padStart(2, '0');
+    const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dataAtual = `${diaAtual}/${mesAtual}`;
+    const nomeMesAtual = meses[hoje.getMonth()];
+
+    document.getElementById('badgeMes').textContent = nomeMesAtual;
+
+    document.querySelectorAll('#tabelaCorpo .dia').forEach(input => {
+        input.value = dataAtual;
+    });
+
+    // ====== FUNÇÕES ======
+    function num(texto) {
+        if (typeof texto === 'number') return texto;
+        return parseFloat(String(texto).replace(/\./g, '').replace(',', '.')) || 0;
+    }
+    function fmt(n) {
+        return n.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    function atualizarTudo() {
+        const salario = num(document.getElementById('salario').value);
+        const rendaExtra = num(document.getElementById('rendaExtra').value);
+        const totalReceitas = salario + rendaExtra;
+        document.getElementById('totalReceitas').textContent = fmt(totalReceitas);
+
+        const listaFixas = document.getElementById('listaFixas');
+        const listaVariaveis = document.getElementById('listaVariaveis');
+        listaFixas.innerHTML = '';
+        listaVariaveis.innerHTML = '';
+        let somaFixas = 0, somaVariaveis = 0;
+
+        document.querySelectorAll('#tabelaCorpo tbody tr').forEach(linha => {
+            const nome = linha.querySelector('.nome').value || '(sem nome)';
+            const valor = num(linha.querySelector('.val').value);
+            const cat = linha.querySelector('.cat').value;
+
+            const item = document.createElement('div');
+            item.className = 'lista-item';
+            item.innerHTML = `<span>${nome}</span><span>${fmt(valor)}</span>`;
+
+            if (cat === 'fixa') {
+                listaFixas.appendChild(item);
+                somaFixas += valor;
+            } else {
+                listaVariaveis.appendChild(item);
+                somaVariaveis += valor;
+            }
+        });
+
+        document.getElementById('somaFixas').textContent = fmt(somaFixas);
+        document.getElementById('somaVariaveis').textContent = fmt(somaVariaveis);
+        const totalDespesas = somaFixas + somaVariaveis;
+        document.getElementById('totalDespesas').textContent = fmt(totalDespesas);
+
+        const saldo = totalReceitas - totalDespesas;
+        const elSaldo = document.getElementById('saldo');
+        elSaldo.textContent = (saldo < 0 ? '- ' : '') + fmt(Math.abs(saldo));
+        elSaldo.className = saldo < 0 ? 'vermelho' : 'positivo';
+    }
+
+    function adicionarLinha() {
+        const corpo = document.querySelector('#tabelaCorpo tbody');
+        const nova = document.createElement('tr');
+        nova.innerHTML = `
+            <td><input class="dia" value="${dataAtual}"></td>
+            <td><input placeholder="Nome do gasto" class="nome" oninput="atualizarTudo()"></td>
+            <td><select class="cat" onchange="atualizarTudo()"><option value="fixa">FIXA</option><option value="variavel">VARIÁVEL</option></select></td>
+            <td><input class="val" placeholder="0,00" oninput="atualizarTudo()"></td>
+            <td style="text-align:center;"><button class="del" onclick="excluirLinha(this)">✕</button></td>
+        `;
+        corpo.appendChild(nova);
+        atualizarTudo();
+    }
+
+    function excluirLinha(botao) {
+        botao.closest('tr').remove();
+        atualizarTudo();
+    }
+
+    // ====== COMUNICAÇÃO COM KODULAR ======
+    // Envia o comando "SALVAR_PDF" para o Kodular
+    function salvarPDF() {
+        if (window.Kodular && window.Kodular.setWebViewString) {
+            window.Kodular.setWebViewString("SALVAR_PDF");
+        } else if (window.AppInventor && window.AppInventor.setWebViewString) {
+            window.AppInventor.setWebViewString("SALVAR_PDF");
+        } else {
+            window.print();
+        }
+    }
+
+    atualizarTudo();
+</script>
+
+</body>
+</html>
